@@ -2,7 +2,7 @@
 /**
  * Assignment 2: Simple UNIX Shell
  * @file pcbtable.h
- * @author ??? (TODO: your name)
+ * @author Andrew M
  * @brief This is the main function of a simple UNIX Shell. You may add additional functions in this file for your implementation
  * @version 0.1
  */
@@ -28,9 +28,32 @@ using namespace std;
  * @param args
  * @return int
  */
+
+ //parent. process receives user input and then, the command gets executed in a seperate process (child)
+ //parent should wait until the child finishes, then the parent can exit. parent must use wait(nULL); i believe.
+ //if a & is used after the command, the parent and child process will run concurrently
+ //fin and fout files, i think i need a library
+ //sys/wait, impies process waiting library. i assume for the the parent to wait for the child
+
+
 int parse_command(char command[], char *args[])
 {
-    // TODO: implement this function
+    //check for an empty command, invalid command, the spaces between words, and when the user clicks enter (, strok, c string lib.
+
+
+    char *aCertainToken = strtok(command, " \t\n"); //make one argument go into just one parsed token, to categorize this even more. 
+
+    int i = 0; //serve as the index iterating through the amt of argus. in the command, 
+
+    while (aCertainToken != NULL)  
+    {
+        args[i] = aCertainToken;
+        i++;
+        aCertainToken = strtok(NULL, " \t\n");
+    }
+    args[i] = NULL; //the last index of a char. array implies the end of the char. array.
+
+    return i; //returns the amt of args. in the command, 
 }
 
 // TODO: Add additional functions if you need
@@ -47,24 +70,33 @@ int main(int argc, char *argv[])
     char *args[MAX_LINE / 2 + 1]; // hold parsed out command line arguments
     int should_run = 1;           /* flag to determine when to exit program */
 
-    // TODO: Add additional variables for the implementation.
 
+    // TODO: Add additional variables for the implementation.
     while (should_run)
     {
         printf("osh>");
-        fflush(stdout);
+        fflush(stdout); // fflush displays instantly, instead of waiting
         // Read the input command
         fgets(command, MAX_LINE, stdin);
         // Parse the input command
         int num_args = parse_command(command, args);
+        //cout << num_args << endl;
+        //* After reading user input, the steps are:., //done
 
-        // TODO: Add your code for the implementation
-        /**
-         * After reading user input, the steps are:
-         * (1) fork a child process using fork()
-         * (2) the child process will invoke execvp()
-         * (3) parent will invoke wait() unless command included &
-         */
+        //* (1) fork a child process using fork()
+        int pid;
+        pid = fork();
+        //* (2) the child process will invoke execvp()
+        if (pid == 0)
+        {
+           execvp(args[0],args); //be sure to check to see where ther user put &, means unix shell has child run in the background 
+        }
+        // * (3) parent will invoke wait() unless command included &
+        else
+        {
+
+        }
+
     }
     return 0;
 }
