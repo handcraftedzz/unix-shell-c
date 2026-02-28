@@ -83,19 +83,49 @@ int main(int argc, char *argv[])
         //cout << num_args << endl;
         //* After reading user input, the steps are:., //done
 
+        
+
+
+
+        char *parentDoesntWait = "&"; //ampersand for strcmp check
+        bool runInBack = false; //if true, parent not waiting
+
+          if (num_args > 0 && strcmp(args[num_args-1],parentDoesntWait) == 0) //if there a & at end, parent does wait. child doesnt have control, propmp backs up
+          //the child running command in background
+            {
+                args[num_args - 1] = NULL;
+                num_args--;
+                runInBack = true;
+            }
+
         //* (1) fork a child process using fork()
-        int pid;
+        pid_t pid; //pid_t data type needed., it's. a signed integer and no assumptions are made by dev. about the size od pid
         pid = fork();
         //* (2) the child process will invoke execvp()
-        if (pid == 0)
+        if (pid == 0)        //if fork returns -1, failed
         {
-           execvp(args[0],args); //be sure to check to see where ther user put &, means unix shell has child run in the background 
+            int resultExec;
+            resultExec = execvp(args[0],args); //be sure to check to see where ther user put &, means unix shell has child run in the background
+
+            if (resultExec == -1) //a failure happended, 
+            {
+                perror("EXECVP returned -1");
+                exit(1); //leave, 
+            }
+                  //if execcvp returns -1,  it failed
         }
-        // * (3) parent will invoke wait() unless command included &
-        else
+        else if (pid > 0)            
         {
+            if (runInBack == false) //
+            {
+                //waitpid, more specific than wait()
+                //wwaitpid will wait for your child instead of any child process. reducing ambuiguity and better practice.
+                //the 0 exercsies the blocking call, not letting the client type another command until the recent command finishes
+                waitpid(pid,NULL,0); //parent must wait for child to fininsh, child has control. can't type another command until process finished.
+            }
 
         }
+        // * (3) parent will invoke wait() unless command included &
 
     }
     return 0;
