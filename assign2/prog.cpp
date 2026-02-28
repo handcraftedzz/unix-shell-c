@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
         }
         if (strcmp(command, eStatus) == 0)
         {
-            exit(1);
+            exit(0); //exit(0) is more for leaving when there wasn't an error but exit(1) is more error orientated. 
         } 
         else if (strcmp(command,recent) == 0) //command and !! being compared
         {
@@ -117,7 +117,7 @@ int main(int argc, char *argv[])
             //since there was no history of commands before this
             listOfHistory = true; //it's true now since a valid command is in the history buffer now
         }
-        
+
 
 
         // Parse the input command
