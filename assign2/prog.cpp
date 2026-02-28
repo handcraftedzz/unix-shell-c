@@ -76,6 +76,9 @@ int main(int argc, char *argv[])
      char historyBuffer[MAX_LINE]; //this buffer will have all the commands that could be invoked via !!.  hist. of recent commands
      bool listOfHistory = false; //there is currently no history, so u can't expect to call the most recently typed command
      //make sure that they have more scope, by being kept out of while Loop.
+     const char *leftArrow = "<"; //for redirecting input anf output
+     const char *rightArrow = ">";
+
 
 
     // TODO: Add additional variables for the implementation.
@@ -125,9 +128,55 @@ int main(int argc, char *argv[])
         //cout << num_args << endl;
         //* After reading user input, the steps are:., //done
 
+        bool noFileName = false;
+        int indexOfArrow = 0; //0 is a possibility since no redirection could occur if no < or >
+        char *fileName = NULL;
+        int fileIndex;
+        int fileType;
+       for (int i = 0; args[i] != NULL; i++)
+       {
+            if (strcmp(args[i],leftArrow) == 0)
+            {
+                if (args[i+1] == NULL) //this is seeing if there is an actual filename after the < or > ... a specific argument after arrow
+                {
+                    noFileName = true;    //is more important how many argument there are, because there could be an argument but not a filename argument
+                                        //after the arrow
+                }   
+                fileType = 1;                     
+                indexOfArrow = i;
+                fileName = args[i+1];
+                fileIndex = i+1;
+                break;
+            }
+            else if (strcmp(args[i],rightArrow) == 0)
+            {
+                if (args[i+1] == NULL) 
+                {
+                    noFileName = true;    
+                                        //
+                }   
+                fileType = 2;
+                indexOfArrow = i;
+                fileName = args[i+1];
+                fileIndex = i+1;
+                break;
+            }
+    
+       }
+
+       if (noFileName == true)
+       {
+            continue;
+       }
+
+       else //use str char, 
+       {
+            args[indexOfArrow] = NULL; //this needs to get set to null in order for execevp() to not read the file 
+            num_args--;
 
 
-
+       }
+ 
 
         const char *parentDoesntWait = "&"; //ampersand for strcmp check
         bool runInBack = false; //if true, parent not waiting
@@ -146,6 +195,37 @@ int main(int argc, char *argv[])
         //* (2) the child process will invoke execvp()
         if (pid == 0)        //if fork returns -1, failed
         {
+            //open file, dup2 into stdin or stdout, close it, execvp.
+            if (fileType == 1) // the < arrow
+            {
+                int fileDES = (fileName, O_RDONLY);
+                //check for errors. , can have errors like pid and execpv
+
+                if (fileDES < 0 )
+                {
+                    perror("OPEN");
+                    exit(1);
+                }
+                dup2(fileDES, STDIN_FILENO);
+                close(fileDES);
+            }
+            else if (fileType == 2) //the > arrow
+            {
+                int fileD = (fileName, O_TRUNC, O_CREAT, O_WRONLY, 0644);
+
+                {
+                    if (fileD < 0)
+                    {
+                        perror("OPEN");
+                        exit(1);
+                    }
+                    dup2(fileD, STDOUT_FILENO);
+                    close(fileD);
+                }
+            }
+
+
+
             int resultExec;
             resultExec = execvp(args[0],args); //be sure to check to see where ther user put &, means unix shell has child run in the background
 
