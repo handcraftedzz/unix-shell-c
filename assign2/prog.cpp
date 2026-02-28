@@ -185,13 +185,13 @@ int main(int argc, char *argv[])
     
        }
 
-       if (noFileName == true)
+       if(noFileName == true)
        {
             printf("NO FILE FOR REDIRECTION!\n");
             continue;
        }
 
-       else //use str char, 
+       else if (fileType != 0) 
        {
             args[indexOfArrow] = NULL; //this needs to get set to null in order for execevp() to not read the file 
             //num_args--;g
@@ -222,7 +222,7 @@ int main(int argc, char *argv[])
             }
             else if (fileType == 2) //the > arrow
             {
-                int fileD = open(fileName, O_TRUNC, O_CREAT, O_WRONLY, 0644);
+                int fileD = open(fileName, O_TRUNC | O_CREAT | O_WRONLY, 0644);
 
                 {
                     if (fileD < 0)
