@@ -105,7 +105,7 @@ int main(int argc, char *argv[])
         {
             if (listOfHistory == false) //no recently typed commands
             {
-                printf("NO HISTORY AT ALL OF COMMANDS!\n");
+                printf("No command history found\n");
                 continue;//skip iteration
             }
             else
@@ -132,13 +132,35 @@ int main(int argc, char *argv[])
         const char *parentDoesntWait = "&"; //ampersand for strcmp check
         bool runInBack = false; //if true, parent not waiting
 
-        if (num_args > 0 && strcmp(args[num_args-1],parentDoesntWait) == 0) //if there a & at end, parent does wait. child doesnt have control, propmp backs up
-          //the child running command in background
+        char *l = args[num_args - 1];
+        int length = strlen(l);
+
+        if (strcmp(l,"&") == 0)
         {
             args[num_args - 1] = NULL;
             num_args--;
             runInBack = true;
         }
+        else if (length > 0 && l[length-1] == '&')
+        {
+            l[length-1] = '\0';
+            runInBack = true;
+
+            if (strlen(l) == 0)
+            {
+                args[num_args - 1] = NULL;
+                num_args--;
+            }
+        }
+        
+
+        /*
+        if (num_args > 0 && strcmp(args[num_args-1],"&") == 0) //if there a & at end, parent does wait. child doesnt have control, propmp backs up
+          //the child running command in background
+        {
+         
+        }
+        */
 
         bool noFileName = false;
         int indexOfArrow = 0; //0 is a possibility since no redirection could occur if no < or >
@@ -242,7 +264,7 @@ int main(int argc, char *argv[])
 
             if (resultExec == -1) //a failure happended, 
             {
-                perror("EXECVP returned -1");
+                printf("Command not found\n");
                 exit(1); //leave, 
             }
                   //if execcvp returns -1,  it failed
