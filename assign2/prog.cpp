@@ -128,11 +128,23 @@ int main(int argc, char *argv[])
         //cout << num_args << endl;
         //* After reading user input, the steps are:., //done
 
+
+        const char *parentDoesntWait = "&"; //ampersand for strcmp check
+        bool runInBack = false; //if true, parent not waiting
+
+        if (num_args > 0 && strcmp(args[num_args-1],parentDoesntWait) == 0) //if there a & at end, parent does wait. child doesnt have control, propmp backs up
+          //the child running command in background
+        {
+            args[num_args - 1] = NULL;
+            num_args--;
+            runInBack = true;
+        }
+
         bool noFileName = false;
         int indexOfArrow = 0; //0 is a possibility since no redirection could occur if no < or >
         char *fileName = NULL;
         int fileIndex;
-        int fileType;
+        int fileType = 0; //implying no redireciton, 
        for (int i = 0; args[i] != NULL; i++)
        {
             if (strcmp(args[i],leftArrow) == 0)
@@ -141,53 +153,52 @@ int main(int argc, char *argv[])
                 {
                     noFileName = true;    //is more important how many argument there are, because there could be an argument but not a filename argument
                                         //after the arrow
+                    break;
                 }   
-                fileType = 1;                     
-                indexOfArrow = i;
-                fileName = args[i+1];
-                fileIndex = i+1;
-                break;
+                else
+                {
+                    fileType = 1;                     //set up variables to get the data of the index of the arrow + the file name after the arow and the file's index
+                    indexOfArrow = i;
+                    fileName = args[i+1];
+                    fileIndex = i+1;
+                    break;
+                }
+
             }
             else if (strcmp(args[i],rightArrow) == 0)
             {
                 if (args[i+1] == NULL) 
                 {
                     noFileName = true;    
+                    break;
                                         //
                 }   
-                fileType = 2;
-                indexOfArrow = i;
-                fileName = args[i+1];
-                fileIndex = i+1;
-                break;
+                else
+                {
+                    fileType = 2;
+                    indexOfArrow = i;
+                    fileName = args[i+1];
+                    fileIndex = i+1;
+                    break;
+                }
             }
     
        }
 
        if (noFileName == true)
        {
+            printf("NO FILE FOR REDIRECTION!\n");
             continue;
        }
 
        else //use str char, 
        {
             args[indexOfArrow] = NULL; //this needs to get set to null in order for execevp() to not read the file 
-            num_args--;
-
-
+            //num_args--;g
        }
  
 
-        const char *parentDoesntWait = "&"; //ampersand for strcmp check
-        bool runInBack = false; //if true, parent not waiting
-
-          if (num_args > 0 && strcmp(args[num_args-1],parentDoesntWait) == 0) //if there a & at end, parent does wait. child doesnt have control, propmp backs up
-          //the child running command in background
-            {
-                args[num_args - 1] = NULL;
-                num_args--;
-                runInBack = true;
-            }
+     
 
         //* (1) fork a child process using fork()
         pid_t pid; //pid_t data type needed., it's. a signed integer and no assumptions are made by dev. about the size od pid
@@ -198,7 +209,7 @@ int main(int argc, char *argv[])
             //open file, dup2 into stdin or stdout, close it, execvp.
             if (fileType == 1) // the < arrow
             {
-                int fileDES = (fileName, O_RDONLY);
+                int fileDES = open(fileName, O_RDONLY);
                 //check for errors. , can have errors like pid and execpv
 
                 if (fileDES < 0 )
@@ -211,7 +222,7 @@ int main(int argc, char *argv[])
             }
             else if (fileType == 2) //the > arrow
             {
-                int fileD = (fileName, O_TRUNC, O_CREAT, O_WRONLY, 0644);
+                int fileD = open(fileName, O_TRUNC, O_CREAT, O_WRONLY, 0644);
 
                 {
                     if (fileD < 0)
