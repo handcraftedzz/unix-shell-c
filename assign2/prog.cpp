@@ -154,14 +154,6 @@ int main(int argc, char *argv[])
         }
         
 
-        /*
-        if (num_args > 0 && strcmp(args[num_args-1],"&") == 0) //if there a & at end, parent does wait. child doesnt have control, propmp backs up
-          //the child running command in background
-        {
-         
-        }
-        */
-
         bool noFileName = false;
         int indexOfArrow = 0; //0 is a possibility since no redirection could occur if no < or >
         char *fileName = NULL;
