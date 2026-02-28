@@ -71,6 +71,13 @@ int main(int argc, char *argv[])
     int should_run = 1;           /* flag to determine when to exit program */
 
 
+     const char *eStatus = "exit";
+     const char *recent = "!!"; //command to invoke the most recent command in hist. , using this for a strcmp
+     char historyBuffer[MAX_LINE]; //this buffer will have all the commands that could be invoked via !!.  hist. of recent commands
+     bool listOfHistory = false; //there is currently no history, so u can't expect to call the most recently typed command
+     //make sure that they have more scope, by being kept out of while Loop.
+
+
     // TODO: Add additional variables for the implementation.
     while (should_run)
     {
@@ -78,16 +85,51 @@ int main(int argc, char *argv[])
         fflush(stdout); // fflush displays instantly, instead of waiting
         // Read the input command
         fgets(command, MAX_LINE, stdin);
+        //now , below. i need to clean up the command so i'm not taking into account the dumb \n (//which is when one types the return (enter) key)
+        //at the end of the command before '\0'
+        command[strcspn(command,"\n")] = '\0';
+
+
+        if (command[0] == '\0') //check for the edge case when a user just types nothing but the enter key into shell
+        {
+            continue; //this jumps back to the top of the loop (iteration skipped), and osh asks for input again
+        }
+        if (strcmp(command, eStatus) == 0)
+        {
+            exit(1);
+        } 
+        else if (strcmp(command,recent) == 0) //command and !! being compared
+        {
+            if (listOfHistory == false) //no recently typed commands
+            {
+                printf("NO HISTORY AT ALL OF COMMANDS!\n");
+                continue;//skip iteration
+            }
+            else
+            {
+                strcpy(command, historyBuffer); //the most recently type command (history) will go into command,
+                printf("%s\n", command); //echo used here, formatted string (%s)
+            }
+        }
+        else 
+        {
+            strcpy(historyBuffer,command);//using strcpy function since dealing with char arrays. in this case, the command just typed goes into history/
+            //since there was no history of commands before this
+            listOfHistory = true; //it's true now since a valid command is in the history buffer now
+        }
+        
+
+
         // Parse the input command
         int num_args = parse_command(command, args);
         //cout << num_args << endl;
         //* After reading user input, the steps are:., //done
 
-        
 
 
 
-        char *parentDoesntWait = "&"; //ampersand for strcmp check
+
+        const char *parentDoesntWait = "&"; //ampersand for strcmp check
         bool runInBack = false; //if true, parent not waiting
 
           if (num_args > 0 && strcmp(args[num_args-1],parentDoesntWait) == 0) //if there a & at end, parent does wait. child doesnt have control, propmp backs up
