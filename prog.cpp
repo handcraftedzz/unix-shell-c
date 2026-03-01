@@ -1,4 +1,3 @@
-
 /**
  * Assignment 2: Simple UNIX Shell
  * @file pcbtable.h
@@ -34,6 +33,7 @@ using namespace std;
  //if a & is used after the command, the parent and child process will run concurrently
  //fin and fout files, i think i need a library
  //sys/wait, impies process waiting library. i assume for the the parent to wait for the child
+ //don't forget to use strtok funct.
 
 
 int parse_command(char command[], char *args[])
