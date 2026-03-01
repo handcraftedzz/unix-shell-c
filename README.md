@@ -1,4 +1,5 @@
 # UNIX Shell Implementation in C
+# Built as part of CS433 Operating Systems.
 
 ## Overview
 Built a custom UNIX-style shell in C that parses user input, creates child processes, and executes commands using low-level POSIX system calls. The shell supports background execution, command history, input/output redirection, and inter-process communication via pipes.
